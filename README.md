@@ -21,7 +21,7 @@ They keep the upstream library names, so they work as drop-in replacements:
 
 ```toml
 [dependencies]
-parking_lot = { package = "parking_lot-napi", version = "0.12" }
+parking_lot = { package = "parking_lot-napi", version = "0.12.6" }
 ```
 
 This library provides implementations of `Mutex`, `RwLock`, `Condvar` and
