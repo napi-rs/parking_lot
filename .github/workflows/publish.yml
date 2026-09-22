@@ -2,17 +2,21 @@ name: Publish
 
 # Publishes all three crates (lock_api-napi, parking_lot_core-napi,
 # parking_lot-napi) in dependency order using crates.io Trusted Publishing
-# (OIDC) — no long-lived token needed once each crate has a GitHub
-# trusted-publishing config pointing at this workflow.
+# (OIDC). No secrets are stored in this repository: crates-io-auth-action
+# exchanges the GitHub OIDC token for a short-lived crates.io token.
 #
-# Bootstrap: crates.io only allows configuring trusted publishing on crates
-# that already exist. For the first publish only, either set a
-# CARGO_REGISTRY_TOKEN repository secret (a scoped publish token — the OIDC
-# step is skipped automatically when the secret exists) or publish once
-# locally with `cargo publish`, then add the trusted-publishing configs on
-# crates.io and remove the secret.
+# Each crate needs a GitHub trusted-publishing config on crates.io
+# (crate Settings → Trusted Publishing → Add → GitHub) with:
+#   repository owner: napi-rs
+#   repository name:  parking_lot
+#   workflow file:    publish.yml
+# Trusted-publishing configs can only be added to crates that already exist,
+# so the first publish of each crate must be done once by hand:
+#   cargo publish -p lock_api-napi
+#   cargo publish -p parking_lot_core-napi
+#   cargo publish -p parking_lot-napi
 #
-# Trigger by pushing a `v*` tag (the crates release in lockstep) or manually.
+# Afterwards, trigger this workflow by pushing a `v*` tag or manually.
 
 on:
   push:
@@ -27,8 +31,6 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    env:
-      CRATES_IO_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +38,6 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Authenticate to crates.io (OIDC)
-        if: ${{ env.CRATES_IO_TOKEN == '' }}
         uses: rust-lang/crates-io-auth-action@v1
         id: auth
 
@@ -45,7 +46,7 @@ jobs:
       - name: Publish lock_api-napi
         run: cargo publish -p lock_api-napi
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || env.CRATES_IO_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Wait for index
         run: sleep 30
@@ -53,7 +54,7 @@ jobs:
       - name: Publish parking_lot_core-napi
         run: cargo publish -p parking_lot_core-napi
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || env.CRATES_IO_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
 
       - name: Wait for index
         run: sleep 30
@@ -61,4 +62,4 @@ jobs:
       - name: Publish parking_lot-napi
         run: cargo publish -p parking_lot-napi
         env:
-          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token || env.CRATES_IO_TOKEN }}
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
