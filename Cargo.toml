@@ -1,15 +1,21 @@
 [package]
-name = "parking_lot"
+name = "parking_lot-napi"
 version = "0.12.5"
 authors = ["Amanieu d'Antras <amanieu@gmail.com>"]
-description = "More compact and efficient implementations of the standard synchronization primitives."
+description = "More compact and efficient implementations of the standard synchronization primitives. Fork of parking_lot with a stable thread parker for threaded WASI targets."
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/Amanieu/parking_lot"
+repository = "https://github.com/napi-rs/parking_lot"
 readme = "README.md"
 keywords = ["mutex", "condvar", "rwlock", "once", "thread"]
 categories = ["concurrency"]
 edition = "2021"
 rust-version = "1.84"
+
+# Keep the upstream library name so the crate is a drop-in replacement:
+# `use parking_lot::Mutex` keeps working in this crate's doctests and in
+# dependents that alias the package (`parking_lot = { package = "parking_lot-napi" }`).
+[lib]
+name = "parking_lot"
 
 [package.metadata.docs.rs]
 features = ["arc_lock", "serde", "deadlock_detection"]
@@ -19,8 +25,8 @@ rustdoc-args = ["--generate-link-to-definition"]
 features = ["arc_lock", "serde", "deadlock_detection"]
 
 [dependencies]
-parking_lot_core = { path = "core", version = "0.9.12" }
-lock_api = { path = "lock_api", version = "0.4.14" }
+parking_lot_core = { path = "core", version = "0.9.12", package = "parking_lot_core-napi" }
+lock_api = { path = "lock_api", version = "0.4.14", package = "lock_api-napi" }
 
 [dev-dependencies]
 rand = "0.8.3"

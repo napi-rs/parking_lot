@@ -56,7 +56,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rustup default nightly
-      - run: cargo doc --workspace --features arc_lock,serde,deadlock_detection --no-deps -p parking_lot -p parking_lot_core -p lock_api
+      - run: cargo doc --workspace --features arc_lock,serde,deadlock_detection --no-deps -p parking_lot-napi -p parking_lot_core-napi -p lock_api-napi
   benchmark:
     runs-on: ubuntu-latest
     steps:

@@ -1,14 +1,28 @@
-parking_lot
-============
+parking_lot-napi
+================
 
-[![Rust](https://github.com/Amanieu/parking_lot/workflows/Rust/badge.svg)](https://github.com/Amanieu/parking_lot/actions)
-[![Crates.io](https://img.shields.io/crates/v/parking_lot.svg)](https://crates.io/crates/parking_lot)
+Fork of [`parking_lot`](https://github.com/Amanieu/parking_lot) for the
+NAPI-RS ecosystem. It adds a working thread parker for threaded WASI targets
+(`wasm32-wasip1-threads`, `wasm32-wasip2-threads`) that works on stable Rust,
+where upstream falls through to a panicking stub and the first contended lock
+aborts the instance.
 
-[Documentation (synchronization primitives)](https://docs.rs/parking_lot/)
+[![Rust](https://github.com/napi-rs/parking_lot/workflows/Rust/badge.svg)](https://github.com/napi-rs/parking_lot/actions)
+[![Crates.io](https://img.shields.io/crates/v/parking_lot-napi.svg)](https://crates.io/crates/parking_lot-napi)
 
-[Documentation (core parking lot API)](https://docs.rs/parking_lot_core/)
+[Documentation (synchronization primitives)](https://docs.rs/parking_lot-napi/)
 
-[Documentation (type-safe lock API)](https://docs.rs/lock_api/)
+[Documentation (core parking lot API)](https://docs.rs/parking_lot_core-napi/)
+
+[Documentation (type-safe lock API)](https://docs.rs/lock_api-napi/)
+
+Published crates: `parking_lot-napi`, `parking_lot_core-napi`, `lock_api-napi`.
+They keep the upstream library names, so they work as drop-in replacements:
+
+```toml
+[dependencies]
+parking_lot = { package = "parking_lot-napi", version = "0.12" }
+```
 
 This library provides implementations of `Mutex`, `RwLock`, `Condvar` and
 `Once` that are smaller, faster and more flexible than those in the Rust

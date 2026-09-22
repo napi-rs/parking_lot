@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Renamed the crates for the NAPI-RS fork: `parking_lot-napi`, `parking_lot_core-napi`, `lock_api-napi` (library names unchanged, drop-in compatible via `package =` renaming)
+- `parking_lot_core-napi`: select a working std Mutex/Condvar-based thread parker on threaded WASI targets (`wasm32-wasip1-threads`, `wasm32-wasip2-threads`) on stable Rust, fixing `Parking not supported on this platform` aborts
+
 ## `parking_lot` - [0.12.5](https://github.com/Amanieu/parking_lot/compare/parking_lot-v0.12.4...parking_lot-v0.12.5) - 2025-09-30
 
 - Bumped MSRV to 1.71

@@ -1,14 +1,17 @@
 [package]
-name = "parking_lot_core"
+name = "parking_lot_core-napi"
 version = "0.9.12"
 authors = ["Amanieu d'Antras <amanieu@gmail.com>"]
-description = "An advanced API for creating custom synchronization primitives."
+description = "An advanced API for creating custom synchronization primitives. Fork of parking_lot_core with a stable thread parker for threaded WASI targets."
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/Amanieu/parking_lot"
+repository = "https://github.com/napi-rs/parking_lot"
 keywords = ["mutex", "condvar", "rwlock", "once", "thread"]
 categories = ["concurrency"]
 edition = "2021"
 rust-version = "1.71.0"
+
+[lib]
+name = "parking_lot_core"
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--generate-link-to-definition"]
