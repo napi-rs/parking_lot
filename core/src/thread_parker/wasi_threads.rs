@@ -1,17 +1,10 @@
-// Copyright 2016 Amanieu d'Antras
-//
-// Licensed under the Apache License, Version 2.0, <LICENSE-APACHE or
-// http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
-// http://opensource.org/licenses/MIT>, at your option. This file may not be
-// copied, modified, or distributed except according to those terms.
-
 //! Thread parker for threaded wasi targets (wasm32-wasip1-threads etc),
 //! built on std's Mutex/Condvar which are futex-based there. Used on stable,
 //! where the wasm_atomic parker isn't available because its intrinsics are
 //! still unstable (rust-lang/rust#77839). Without this, threaded wasi builds
 //! on stable fall through to the panicking wasm.rs stub.
 
-use core::mem;
+use core::{mem, ptr::NonNull};
 use std::sync::{Condvar, Mutex, MutexGuard};
 use std::time::Instant;
 
@@ -80,15 +73,17 @@ impl super::ThreadParkerT for ThreadParker {
             // until unpark() runs. Holding the mutex keeps the parked thread
             // alive until then, so the parker can't go away under us (the
             // other parkers do the same thing with raw pointers).
-            guard: mem::transmute::<MutexGuard<'_, bool>, MutexGuard<'static, bool>>(guard),
-            condvar: &self.condvar,
+            guard: unsafe {
+                mem::transmute::<MutexGuard<'_, bool>, MutexGuard<'static, bool>>(guard)
+            },
+            condvar: NonNull::from(&self.condvar),
         }
     }
 }
 
 pub struct UnparkHandle {
     guard: MutexGuard<'static, bool>,
-    condvar: *const Condvar,
+    condvar: NonNull<Condvar>,
 }
 
 impl super::UnparkHandleT for UnparkHandle {
@@ -99,7 +94,7 @@ impl super::UnparkHandleT for UnparkHandle {
         // We notify while holding the lock here to avoid races with the target
         // thread. In particular, the thread could exit after we release the
         // mutex, which would make the condvar access invalid memory.
-        (*self.condvar).notify_one();
+        unsafe { self.condvar.as_ref() }.notify_one();
         drop(self.guard);
     }
 }
